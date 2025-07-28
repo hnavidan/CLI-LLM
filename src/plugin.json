@@ -4,8 +4,8 @@
   "name": "LLM-Panel",
   "id": "navidan-llm-panel",
   "info": {
-    "keywords": ["panel"],
-    "description": "",
+    "keywords": ["llm", "large language model", "panel", "data analysis", "decision making"],
+    "description": "A Grafana plugin for interacting with Large Language Models (LLMs) for data analysis and decision making.",
     "author": {
       "name": "Hojjat Navidan"
     },
@@ -13,8 +13,29 @@
       "small": "img/logo.svg",
       "large": "img/logo.svg"
     },
-    "links": [],
-    "screenshots": [],
+    "links": [
+      {
+        "name": "GitHub",
+        "url": "https://github.com/hnavidan/CLI-LLM"
+      }
+    ],
+    "screenshots": [{
+      "name": "Closed-loop decision making and environment control",
+      "path": "img/panel-control.png"
+    },
+    {
+      "name": "Insights and data analysis",
+      "path": "img/panel-analysis.png"
+    },
+    {
+      "name": "General configuration",
+      "path": "img/config-general.png"
+    },
+    {
+      "name": "Control configuration",
+      "path": "img/config-control.png"
+    }
+  ],
     "version": "%VERSION%",
     "updated": "%TODAY%"
   },
