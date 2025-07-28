@@ -1,6 +1,7 @@
 import { PanelPlugin, SelectableValue } from '@grafana/data';
 import { SimpleOptions } from './types';
 import { LLMPanel } from './components/LLMPanel';
+import { logger } from './utils/logger';
 
 const fetchModelsFromBackend = async (
   provider: string | undefined,
@@ -23,7 +24,7 @@ const fetchModelsFromBackend = async (
      }
      modelsUrl = `${backendAddr.replace(/\/$/, '')}/models`; // Remove trailing slash if exists
   } catch (e: any) {
-      console.error("Invalid Backend Address:", backendAddr, e);
+      logger.error("Invalid Backend Address:", backendAddr, e);
       return [{ label: 'Invalid Backend Address', value: '', description: e?.message || 'Check format (e.g., http://host:port)'}];
   }
 
@@ -44,7 +45,7 @@ const fetchModelsFromBackend = async (
               const errorBody = await response.json();
               errorMsg = errorBody?.error || errorMsg; // Use error message from backend if available
           } catch (_) { /* Ignore if response body is not JSON */ }
-          console.error('Error response from backend /models:', errorMsg);
+          logger.error('Error response from backend /models:', errorMsg);
           throw new Error(errorMsg);
       }
 
@@ -52,7 +53,7 @@ const fetchModelsFromBackend = async (
       const models: Array<SelectableValue<string>> = await response.json();
 
       if (!Array.isArray(models)) {
-           console.error('Invalid response format from backend /models:', models);
+           logger.error('Invalid response format from backend /models:', models);
            throw new Error('Backend returned invalid format.');
       }
 
@@ -64,7 +65,7 @@ const fetchModelsFromBackend = async (
       return models;
 
   } catch (error) {
-      console.error('Failed to fetch models from backend:', error);
+      logger.error('Failed to fetch models from backend:', error);
       return [{ label: 'Failed to fetch models', value: '', description: `Error: ${error instanceof Error ? error.message : String(error)}` }];
   }
 };

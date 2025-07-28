@@ -1,6 +1,7 @@
 import { DataFrame, TimeRange, RawTimeRange, dateTime } from '@grafana/data';
 import { SerializationResult, IncrementalDataResult } from '../types/index';
 import { generateUniqueFieldId, formatTimestamp } from '../utils/dataUtils';
+import { logger } from '../utils/logger';
 
 export class DataProcessor {
   /**
@@ -17,7 +18,7 @@ export class DataProcessor {
     const valueField = series.fields.find((field) => field.name === uniqueId);
 
     if (!timeColumn || !valueField) {
-      console.warn(`serializeData: Could not find time column or value field for uniqueId: ${uniqueId}`);
+      logger.warn(`serializeData: Could not find time column or value field for uniqueId: ${uniqueId}`);
       return { data: {}, latestTimestamp: null };
     }
 
@@ -155,11 +156,11 @@ export class DataProcessor {
     autoPromptInterval: number | null = null
   ): { data: any; timeRange: TimeRange; latestTimestamp: number | null } | null {
     if (!data?.series) {
-      console.warn("logPanelData called with no data series.");
+      logger.warn("logPanelData called with no data series.");
       return null;
     }
     if (!includePanel || selectedFieldIds.length === 0) {
-      console.log("logPanelData: Data inclusion disabled or no fields selected.");
+      logger.log("logPanelData: Data inclusion disabled or no fields selected.");
       return null;
     }
 
@@ -198,7 +199,7 @@ export class DataProcessor {
           const uniqueId = generateUniqueFieldId(valueField, series.name || '');
 
           if (uniqueId && selectedFieldIds.includes(uniqueId)) {
-            console.log(`Processing data for selected field: ${uniqueId}`);
+            logger.log(`Processing data for selected field: ${uniqueId}`);
             const { data: seriesData, latestTimestamp: seriesLatestTimestamp } = this.serializeDataForMultiplePanels(
               series,
               uniqueId,
@@ -220,7 +221,7 @@ export class DataProcessor {
     });
 
     const combinedData = this.restructurePanelData(allFieldsData);
-    console.log('Final Combined Data before sending:', JSON.stringify(combinedData, null, 2));
+    logger.log('Final Combined Data before sending:', JSON.stringify(combinedData, null, 2));
 
     return { data: combinedData, timeRange: customTimeRange, latestTimestamp };
   }

@@ -1,4 +1,5 @@
 import { ChatMessage } from '../types/index';
+import { logger } from '../utils/logger';
 
 /**
  * Makes API call to the backend LLM service
@@ -64,9 +65,9 @@ export const forwardResponseToEndpoint = async (
     // Try to parse the entire content as raw JSON first
     try {
       parsedPayload = JSON.parse(rawAiContent);
-      console.log("Successfully parsed raw JSON response");
+      logger.log("Successfully parsed raw JSON response");
     } catch (e) {
-      console.log("Content is not raw JSON, trying alternative extraction methods");
+      logger.log("Content is not raw JSON, trying alternative extraction methods");
       
       // Try to parse as {"llmResponse": "..."} format
       try {
@@ -74,16 +75,16 @@ export const forwardResponseToEndpoint = async (
         if (typeof parsedOuter.llmResponse === 'string') {
           try {
             parsedPayload = JSON.parse(parsedOuter.llmResponse);
-            console.log("Parsed JSON from llmResponse field");
+            logger.log("Parsed JSON from llmResponse field");
           } catch (innerError) {
             const innerString = parsedOuter.llmResponse;
             const jsonCodeBlockMatch = innerString.match(/```json\n([\s\S]*?)\n```/);
             if (jsonCodeBlockMatch && jsonCodeBlockMatch[1]) {
               try {
                 parsedPayload = JSON.parse(jsonCodeBlockMatch[1].trim());
-                console.log("Parsed JSON from code block inside llmResponse");
+                logger.log("Parsed JSON from code block inside llmResponse");
               } catch (blockError) {
-                console.error("Found code block but content isn't valid JSON");
+                logger.error("Found code block but content isn't valid JSON");
               }
             }
           }
@@ -93,9 +94,9 @@ export const forwardResponseToEndpoint = async (
         if (jsonCodeBlockMatch && jsonCodeBlockMatch[1]) {
           try {
             parsedPayload = JSON.parse(jsonCodeBlockMatch[1].trim());
-            console.log("Parsed JSON from markdown code block");
+            logger.log("Parsed JSON from markdown code block");
           } catch (blockError) {
-            console.error("Found code block but content isn't valid JSON");
+            logger.error("Found code block but content isn't valid JSON");
           }
         }
       }
@@ -110,7 +111,7 @@ export const forwardResponseToEndpoint = async (
       if (!headers['Content-Type'] && !headers['content-type']) {
         headers['Content-Type'] = 'application/json';
       }
-      console.log("Successfully prepared JSON array body for fetch:", body);
+      logger.log("Successfully prepared JSON array body for fetch:", body);
     } else {
       throw new Error("Auto-forward failed: Could not find valid JSON content to send.");
     }

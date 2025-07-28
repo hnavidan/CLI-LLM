@@ -1,5 +1,6 @@
 import html2canvas from 'html2canvas';
 import { dateTime } from '@grafana/data';
+import { logger } from './logger';
 
 /**
  * Captures a screenshot of the current dashboard
@@ -9,7 +10,7 @@ export const takeScreenshot = async (): Promise<string | null> => {
     const canvas = await html2canvas(document.body, { useCORS: true, logging: false });
     return canvas.toDataURL('image/png');
   } catch (error) {
-    console.error('Error capturing screenshot:', error);
+    logger.error('Error capturing screenshot:', error);
     return null;
   }
 };

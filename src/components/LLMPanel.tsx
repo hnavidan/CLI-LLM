@@ -9,6 +9,7 @@ import { useAvailableFields } from '../hooks/useAvailableFields';
 import { sendChatRequest, forwardResponseToEndpoint } from '../services/apiService';
 import { DataProcessor } from '../services/dataProcessor';
 import { takeScreenshot, getHiddenPrompt } from '../utils/dataUtils';
+import { logger } from '../utils/logger';
 
 interface Props extends PanelProps<SimpleOptions> {}
 
@@ -89,7 +90,7 @@ export const LLMPanel: React.FC<Props> = ({ options, data, width, height, timeRa
         if (result) {
           panelData = result.data;
           initialLatestTimestamp = result.latestTimestamp;
-          console.log('Initial Data Sent:', JSON.stringify(panelData, null, 2));
+          logger.log('Initial Data Sent:', JSON.stringify(panelData, null, 2));
         }
       }
 
@@ -126,7 +127,7 @@ export const LLMPanel: React.FC<Props> = ({ options, data, width, height, timeRa
 
       if (initialLatestTimestamp !== null) {
         setLastSentTimestamp(initialLatestTimestamp);
-        console.log(`Set initial lastSentTimestamp to: ${new Date(initialLatestTimestamp).toISOString()}`);
+        logger.log(`Set initial lastSentTimestamp to: ${new Date(initialLatestTimestamp).toISOString()}`);
       }
     } catch (err: any) {
       setError(err.message || 'An error occurred');
@@ -148,7 +149,7 @@ export const LLMPanel: React.FC<Props> = ({ options, data, width, height, timeRa
 
     if (newLatestTimestamp !== null && Object.keys(panelData).length > 0) {
       isProcessingDataUpdate.current = true;
-      console.log(`Auto-update: Found new data up to ${new Date(newLatestTimestamp).toISOString()}`);
+      logger.log(`Auto-update: Found new data up to ${new Date(newLatestTimestamp).toISOString()}`);
 
       const processUpdate = async () => {
         setLoading(true);
@@ -198,7 +199,7 @@ export const LLMPanel: React.FC<Props> = ({ options, data, width, height, timeRa
 
           setLastSentTimestamp(newLatestTimestamp);
         } catch (err: any) {
-          console.error('Auto-update Error:', err.message);
+          logger.error('Auto-update Error:', err.message);
           setError(`Auto-update failed: ${err.message}`);
         } finally {
           isProcessingDataUpdate.current = false;
