@@ -17,6 +17,15 @@ CORS(app) # Enable CORS for all routes
 
 load_dotenv()
 
+
+PROVIDER_ENV_VAR_MAP = {
+    "google": "GOOGLE_API_KEY",
+    "anthropic": "ANTHROPIC_API_KEY",
+    "chatgpt": "OPENAI_API_KEY",
+    "grok": "XAI_API_KEY",
+    "glama": "GLAMA_API_KEY",
+}
+
 PROVIDER_API_CONFIG = {
     "google": {
         "url_template": "https://generativelanguage.googleapis.com/v1beta/models?key={api_key}",
@@ -144,8 +153,17 @@ def get_models():
         api_key = data.get('apiKey')
         provider = data.get('provider')
 
-        if not api_key or not provider:
-            return jsonify({"error": "Missing required parameters (apiKey, provider)"}), 400
+        if not provider:
+            return jsonify({"error": "Missing required parameter (provider)"}), 400
+
+        # If API key is not provided in the request, try to get it from environment variables
+        if not api_key:
+            env_var_name = PROVIDER_ENV_VAR_MAP.get(provider)
+            if env_var_name:
+                api_key = os.getenv(env_var_name)
+
+        if not api_key:
+            return jsonify({"error": f"Missing API Key for {provider}. Please provide it in the panel or set the {PROVIDER_ENV_VAR_MAP.get(provider)} environment variable."}), 400
 
         # Try using provider's get_models method first (more reliable)
         try:
@@ -208,8 +226,17 @@ def chat():
         # panel_data = data.get('panelData') # Keep if needed, maybe append to last message?
         options = data.get('options', {}) # Includes model for Glama
 
-        if not api_key or not provider_name or not messages_input:
-            return jsonify({"error": "Missing required parameters (apiKey, llmProvider, messages)"}), 400
+        if not provider_name or not messages_input:
+            return jsonify({"error": "Missing required parameters (llmProvider, messages)"}), 400
+
+        # If API key is not provided in the request, try to get it from environment variables
+        if not api_key:
+            env_var_name = PROVIDER_ENV_VAR_MAP.get(provider_name)
+            if env_var_name:
+                api_key = os.getenv(env_var_name)
+
+        if not api_key:
+            return jsonify({"error": f"Missing API Key for {provider_name}. Please provide it in the panel or set the {PROVIDER_ENV_VAR_MAP.get(provider_name)} environment variable."}), 400
 
         # --- Centralized Message Preparation ---
         prepared_messages: List[Dict[str, Any]] = []
