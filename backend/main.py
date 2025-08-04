@@ -19,20 +19,20 @@ load_dotenv()
 
 
 PROVIDER_ENV_VAR_MAP = {
-    "google": "GOOGLE_API_KEY",
-    "anthropic": "ANTHROPIC_API_KEY",
-    "chatgpt": "OPENAI_API_KEY",
-    "grok": "XAI_API_KEY",
-    "glama": "GLAMA_API_KEY",
+    "Google": "GOOGLE_API_KEY",
+    "Anthropic": "ANTHROPIC_API_KEY",
+    "OpenAI": "OPENAI_API_KEY",
+    "xAI": "XAI_API_KEY",
+    "Glama": "GLAMA_API_KEY",
 }
 
 PROVIDER_API_CONFIG = {
-    "google": {
+    "Google": {
         "url_template": "https://generativelanguage.googleapis.com/v1beta/models?key={api_key}",
         "method": "GET",
         "auth_type": "query_param", # Key goes in URL
     },
-    "anthropic": {
+    "Anthropic": {
         "url": "https://api.anthropic.com/v1/models",
         "method": "GET",
         "auth_type": "header",
@@ -42,17 +42,17 @@ PROVIDER_API_CONFIG = {
             "Content-Type": "application/json",
         }
     },
-    "chatgpt": { # OpenAI
+    "OpenAI": { # OpenAI
         "url": "https://api.openai.com/v1/models",
         "method": "GET",
         "auth_type": "bearer", # Authorization: Bearer {api_key}
     },
-    "grok": { # xAI
+    "xAI": { # xAI
         "url": "https://api.x.ai/v1/models", # Updated to correct xAI URL
         "method": "GET",
         "auth_type": "bearer",
     },
-     "glama": {
+     "Glama": {
         "url": "https://glama.ai/api/gateway/openai/v1/models", # Glama's specific endpoint
         "method": "GET",
         "auth_type": "bearer",
@@ -95,7 +95,7 @@ def fetch_and_format_models(provider: str, api_key: str) -> List[Dict[str, str]]
 
         # Parse the response based on provider structure
         models_data = []
-        if provider == "google":
+        if provider == "Google":
             models_data = data.get("models", [])
             # Filter and map Google models
             formatted_models = [
@@ -106,7 +106,7 @@ def fetch_and_format_models(provider: str, api_key: str) -> List[Dict[str, str]]
                 for m in models_data
                 if m.get("name") and "generateContent" in m.get("supportedGenerationMethods", [])
             ]
-        elif provider == "anthropic":
+        elif provider == "Anthropic":
             models_data = data.get("data", [])
             # Map Anthropic models
             formatted_models = [
@@ -189,26 +189,26 @@ def get_models():
 
 def create_llm_provider(provider_name: str, api_key: str):
     """Factory function to create LLM provider instances."""
-    if provider_name == "google":
+    if provider_name == "Google":
         if not GeminiProvider.validate_api_key(api_key):
             raise ValueError("Invalid Google API Key")
         return GeminiProvider(api_key)
-    elif provider_name == "chatgpt": # Assuming maps to OpenAIProvider
+    elif provider_name == "OpenAI": # Assuming maps to OpenAIProvider
         # Make sure OpenAIProvider exists and follows the pattern
         if not OpenAIProvider.validate_api_key(api_key):
             raise ValueError("Invalid OpenAI API Key")
         return OpenAIProvider(api_key)
-    elif provider_name == "grok":
+    elif provider_name == "xAI":
          # Make sure XAIProvider exists and follows the pattern
         if not XAIProvider.validate_api_key(api_key):
             raise ValueError("Invalid xAI API Key")
         return XAIProvider(api_key)
-    elif provider_name == "anthropic":
+    elif provider_name == "Anthropic":
          # Make sure AnthropicProvider exists and follows the pattern
         if not AnthropicProvider.validate_api_key(api_key):
             raise ValueError("Invalid Anthropic API Key")
         return AnthropicProvider(api_key)
-    elif provider_name == "glama": # <-- Add Glama case
+    elif provider_name == "Glama": # <-- Add Glama case
         if not GlamaProvider.validate_api_key(api_key):
             raise ValueError("Invalid Glama API Key")
         return GlamaProvider(api_key)
@@ -243,7 +243,7 @@ def chat():
 
         # Handle potential screenshot (currently only for Google Gemini)
         image_part = None
-        if screenshot_base64 and provider_name == "google":
+        if screenshot_base64 and provider_name == "Google":
             try:
                 # Ensure correct padding for base64
                 screenshot_data = screenshot_base64.split(',', 1)[1]
@@ -265,13 +265,13 @@ def chat():
                  return jsonify({"error": f"Invalid message format at index {i}: {message}"}), 400
 
             # Adjust roles if needed (e.g., Gemini specific adjustments)
-            if provider_name == "google":
+            if provider_name == "Google":
                 # Gemini uses 'user' and 'model'. Map 'system' to 'user'.
                 # The first message can often be 'system', treat it as 'user'.
                 # Subsequent system messages might need careful handling depending on context.
                 # Let's map system -> user for simplicity here.
                  target_role = 'user' if role in ['user', 'system'] else 'model'
-            elif provider_name == "glama" or provider_name == "chatgpt":
+            elif provider_name == "Glama" or provider_name == "OpenAI":
                  # OpenAI/Glama typically use 'user', 'assistant', 'system'
                  # Keep roles as they are, assuming frontend sends compatible roles
                  target_role = role
@@ -285,10 +285,10 @@ def chat():
             message_dict = {"role": target_role}
 
             # Add image part to the *last* message if it exists (Gemini logic)
-            if image_part and i == len(messages_input) - 1 and provider_name == "google":
+            if image_part and i == len(messages_input) - 1 and provider_name == "Google":
                  message_dict["parts"] = [{"text": content}, image_part]
             else:
-                 if provider_name == "google":
+                 if provider_name == "Google":
                      # Gemini needs parts structure
                      message_dict["parts"] = [{"text": content}]
                      # If image is present and it's the last message, add it
@@ -325,7 +325,7 @@ def chat():
 
         # --- Provider Instantiation and Call ---
         # Check for Glama required option *before* creating provider
-        if provider_name == "glama" and not options.get('model'):
+        if provider_name == "Glama" and not options.get('model'):
              return jsonify({"error": "Missing 'model' in options for Glama provider"}), 400
 
         llm_provider = create_llm_provider(provider_name, api_key)

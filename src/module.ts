@@ -11,7 +11,7 @@ const fetchModelsFromBackend = async (
 
   // Basic validation before calling backend
   if (!provider) { return [{ label: 'Select a provider', value: '' }]; }
-  if (!apiKey) { return [{ label: 'Enter API Key', value: '' }]; }
+  // if (!apiKey) { return [{ label: 'Enter API Key', value: '' }]; } No longer required as backend handles it
   if (!backendAddr) { return [{ label: 'Enter Backend Address', value: '', description: 'Required to fetch models' }]; }
 
   // Construct URL to your backend's new /models endpoint
@@ -71,14 +71,14 @@ const fetchModelsFromBackend = async (
 };
 
 export const plugin = new PanelPlugin<SimpleOptions>(LLMPanel).setPanelOptions((builder, context) => {
-  const providersWithModels = ['glama', 'google', 'chatgpt', 'grok', 'anthropic'];
+  const providersWithModels = ['Glama', 'Google', 'OpenAI', 'xAI', 'Anthropic'];
 
   return builder
     .addTextInput({
       path: 'backendAddr',
       name: 'Backend Address',
       description: 'Enter the address of the backend server. (e.g, http://localhost:5000)',
-      defaultValue: 'localhost', // Default to localhost
+      defaultValue: 'http://localhost:5000', 
     })
     .addSelect({
       path: 'llmProvider',
@@ -86,19 +86,19 @@ export const plugin = new PanelPlugin<SimpleOptions>(LLMPanel).setPanelOptions((
       description: 'Select the API Provider',
       settings: {
         options: [
-          { label: 'Glama', value: 'glama' },
-          { label: 'xAI (Grok)', value: 'grok' },
-          { label: 'OpenAI', value: 'chatgpt' },
-          { label: 'Google', value: 'google' },
-          { label: 'Anthropic', value: 'anthropic' },
+          { label: 'Glama', value: 'Glama' },
+          { label: 'xAI (Grok)', value: 'xAI' },
+          { label: 'OpenAI', value: 'OpenAI' },
+          { label: 'Google', value: 'Google' },
+          { label: 'Anthropic', value: 'Anthropic' },
         ],
       },
-      defaultValue: 'google',
+      defaultValue: 'Google',
     })
     .addTextInput({
       path: 'apiKey',
-      name: 'API Key',
-      description: 'Enter your API key',
+      name: 'API Key (Optinoal)',
+      description: 'Leave blank to use the environment variables in the backend (Recommended). Keys entered here are not secure and are accessible by other users of the dashboard. Only use for testing purposes.',
       defaultValue: '',
       settings: {
         secure: true,

@@ -39,12 +39,12 @@
       "id": 1,
       "options": {
         "apiKey": "",
-        "backendAddr": "localhost",
+        "backendAddr": "http://localhost:5000",
         "context": "",
         "controlEndpointHeaders": "",
         "controlEndpointMethod": "POST",
         "controlEndpointUrl": "",
-        "llmProvider": "google",
+        "llmProvider": "Google",
         "model": ""
       },
       "pluginVersion": "1.0.0",
