@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.2
+Add support to store API keys in the backend as environment variables.
+
 ## 1.0.1
 Add screenshots to the plugin.json and readme
 Improve the console logging and enable it only for debugging and development
