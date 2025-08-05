@@ -52,6 +52,48 @@ backend/
 
 - Python 3.8+
 
+### Environment Variables (API Keys)
+
+You can configure API keys as environment variables instead of entering them in the Grafana panel. The backend supports the following environment variables:
+
+- `GOOGLE_API_KEY` - For Google Gemini API
+- `OPENAI_API_KEY` - For OpenAI API  
+- `ANTHROPIC_API_KEY` - For Anthropic Claude API
+- `XAI_API_KEY` - For xAI Grok API
+- `GLAMA_API_KEY` - For Glama API
+
+**Setting Environment Variables:**
+
+**On Windows (PowerShell):**
+```powershell
+$env:GOOGLE_API_KEY="your_google_api_key_here"
+$env:OPENAI_API_KEY="your_openai_api_key_here"
+$env:ANTHROPIC_API_KEY="your_anthropic_api_key_here"
+$env:XAI_API_KEY="your_xai_api_key_here"
+$env:GLAMA_API_KEY="your_glama_api_key_here"
+```
+
+**On Linux/macOS:**
+```bash
+export GOOGLE_API_KEY="your_google_api_key_here"
+export OPENAI_API_KEY="your_openai_api_key_here"
+export ANTHROPIC_API_KEY="your_anthropic_api_key_here"
+export XAI_API_KEY="your_xai_api_key_here"
+export GLAMA_API_KEY="your_glama_api_key_here"
+```
+
+**Using .env file:**
+Create a `.env` file in the backend directory:
+```env
+GOOGLE_API_KEY=your_google_api_key_here
+OPENAI_API_KEY=your_openai_api_key_here
+ANTHROPIC_API_KEY=your_anthropic_api_key_here
+XAI_API_KEY=your_xai_api_key_here
+GLAMA_API_KEY=your_glama_api_key_here
+```
+
+> **Note:** If an API key is provided in the Grafana panel, it will override the environment variable.
+
 #### Option 1: Using Python
 
 1. **Clone and navigate to backend directory:**
@@ -78,16 +120,38 @@ backend/
    docker build -t llm-backend .
    ```
 
-2. **Run the container:**
+2. **Run the container with environment variables:**
    ```bash
-   docker run -p 5000:5000 llm-backend
+   docker run -p 5000:5000 \
+     -e GOOGLE_API_KEY="your_google_api_key_here" \
+     -e OPENAI_API_KEY="your_openai_api_key_here" \
+     -e ANTHROPIC_API_KEY="your_anthropic_api_key_here" \
+     -e XAI_API_KEY="your_xai_api_key_here" \
+     -e GLAMA_API_KEY="your_glama_api_key_here" \
+     llm-backend
+   ```
+
+   **Or using an .env file:**
+   ```bash
+   docker run -p 5000:5000 --env-file .env llm-backend
    ```
 
 #### Option 3: Kubernetes Deployment
 
-```bash
-kubectl apply -f backend.yaml
-```
+1. **Create a Secret for API keys (recommended):**
+   ```bash
+   kubectl create secret generic llm-api-keys \
+     --from-literal=GOOGLE_API_KEY="your_google_api_key_here" \
+     --from-literal=OPENAI_API_KEY="your_openai_api_key_here" \
+     --from-literal=ANTHROPIC_API_KEY="your_anthropic_api_key_here" \
+     --from-literal=XAI_API_KEY="your_xai_api_key_here" \
+     --from-literal=GLAMA_API_KEY="your_glama_api_key_here"
+   ```
+
+2. **Deploy the application:**
+   ```bash
+   kubectl apply -f backend.yaml
+   ```
 
 ## Port Configuration
 If you wish to change the port, you must also change it within the Dockerfile and backend.yaml as well.

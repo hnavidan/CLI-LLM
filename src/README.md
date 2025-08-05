@@ -23,7 +23,8 @@ The CLI-LLM Panel offers configuration options accessible through the panel edit
 
 - **Backend Address**: Configure the endpoint URL for your LLM backend service. In case of commercial APIs it has to be the address a message forwarder. Click [here](https://github.com/hnavidan/CLI-LLM/tree/main/backend) for more information.
 - **API Provider**: Select from the list of supported API Provider.
-- **API Key**: Enter the corresponding API key.
+- **API Key**: Enter the corresponding API key. 
+    ⚠️ Warning: Entering your API key directly here is not secure, as it can be accessed by others using the dashboard. It is strongly recommended to store API keys as environment variables in the backend for enhanced security.
 - **Model**: Choose the specific AI model to use.
 - **Context**: Set the context or system prompt for the LLM.
 
