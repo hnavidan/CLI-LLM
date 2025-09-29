@@ -43,7 +43,7 @@ This repository contains:
 
 ## TODO
 
-- [ ] Fetch models from the API provider for other providers
-- [ ] Improve backend security
+- [x] Fetch models from the API provider for other providers
+- [x] Improve backend security
 - [ ] Improve the screenshot feature make use of multi-modal data
 - [ ] Feature to upload PDF as part of system prompt
