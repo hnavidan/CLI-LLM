@@ -205,9 +205,31 @@ const config = async (env): Promise<Configuration> => {
           { from: '../CHANGELOG.md', to: '.', force: true },
           { from: '**/*.json', to: '.' },
           { from: '**/*.svg', to: '.', noErrorOnMissing: true },
-          { from: '**/*.png', to: '.', noErrorOnMissing: true },
+          // Exclude documentation images from img/ directory
+          { 
+            from: '**/*.png', 
+            to: '.', 
+            noErrorOnMissing: true,
+            globOptions: {
+              ignore: [
+                '**/img/**',  // Ignore all img directory, we'll copy it selectively below
+              ],
+            },
+          },
           { from: '**/*.html', to: '.', noErrorOnMissing: true },
-          { from: 'img/**/*', to: '.', noErrorOnMissing: true },
+          // Only copy logo.svg from img directory, exclude documentation PNGs
+          { 
+            from: 'img/**/*', 
+            to: '.', 
+            noErrorOnMissing: true,
+            globOptions: {
+              ignore: [
+                '**/config-*.png',
+                '**/panel-*.png', 
+                '**/models.png',
+              ],
+            },
+          },
           { from: 'libs/**/*', to: '.', noErrorOnMissing: true },
           { from: 'static/**/*', to: '.', noErrorOnMissing: true },
           { from: '**/query_help.md', to: '.', noErrorOnMissing: true },
