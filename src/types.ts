@@ -7,4 +7,5 @@ export interface SimpleOptions {
   controlEndpointUrl?: string;
   controlEndpointMethod?: 'POST' | 'PUT'; 
   controlEndpointHeaders?: string;
+  ollamaArgs?: string;
 }

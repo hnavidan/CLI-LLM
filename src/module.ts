@@ -71,7 +71,7 @@ const fetchModelsFromBackend = async (
 };
 
 export const plugin = new PanelPlugin<SimpleOptions>(LLMPanel).setPanelOptions((builder, context) => {
-  const providersWithModels = ['Glama', 'Google', 'OpenAI', 'xAI', 'Anthropic'];
+  const providersWithModels = ['Glama', 'Google', 'OpenAI', 'xAI', 'Anthropic', 'Ollama'];
 
   return builder
     .addTextInput({
@@ -91,14 +91,15 @@ export const plugin = new PanelPlugin<SimpleOptions>(LLMPanel).setPanelOptions((
           { label: 'OpenAI', value: 'OpenAI' },
           { label: 'Google', value: 'Google' },
           { label: 'Anthropic', value: 'Anthropic' },
+          { label: 'Ollama', value: 'Ollama' },
         ],
       },
       defaultValue: 'Google',
     })
     .addTextInput({
       path: 'apiKey',
-      name: 'API Key (Optinoal)',
-      description: 'Leave blank to use the environment variables in the backend (Recommended). Keys entered here are not secure and are accessible by other users of the dashboard. Only use for testing purposes.',
+      name: 'API Key or Host',
+      description: 'For Ollama, provide the host address (e.g., http://localhost:11434). For others, leave blank to use backend environment variables (Recommended).',
       defaultValue: '',
       settings: {
         secure: true,
@@ -123,6 +124,17 @@ export const plugin = new PanelPlugin<SimpleOptions>(LLMPanel).setPanelOptions((
       },
       // Show only if the provider is known to support models
       showIf: (config) => providersWithModels.includes(config.llmProvider),
+      defaultValue: '',
+    })
+    .addTextInput({
+      path: 'ollamaArgs',
+      name: 'Ollama Parameters (Optional)',
+      description: 'Additional Ollama parameters as a comma-separated list of key:value pairs (e.g., temperature:0.7, top_p:0.9).',
+      showIf: (config) => config.llmProvider === 'Ollama',
+      settings: {
+        useTextarea: true,
+        rows: 3,
+      },
       defaultValue: '',
     })
     .addTextInput({

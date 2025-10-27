@@ -7,7 +7,8 @@ from llm_providers.gemini_provider import GeminiProvider
 from llm_providers.openai_provider import OpenAIProvider
 from llm_providers.xai_provider import XAIProvider  # Updated import
 from llm_providers.anthropic_provider import AnthropicProvider
-from llm_providers.glama_provider import GlamaProvider 
+from llm_providers.glama_provider import GlamaProvider
+from llm_providers.ollama_provider import OllamaProvider
 from typing import Dict, Any, List # Import List
 from flask_cors import CORS
 import base64
@@ -24,6 +25,7 @@ PROVIDER_ENV_VAR_MAP = {
     "OpenAI": "OPENAI_API_KEY",
     "xAI": "XAI_API_KEY",
     "Glama": "GLAMA_API_KEY",
+    "Ollama": "OLLAMA_HOST",
 }
 
 PROVIDER_API_CONFIG = {
@@ -212,6 +214,10 @@ def create_llm_provider(provider_name: str, api_key: str):
         if not GlamaProvider.validate_api_key(api_key):
             raise ValueError("Invalid Glama API Key")
         return GlamaProvider(api_key)
+    elif provider_name == "Ollama":
+        if not OllamaProvider.validate_connection(api_key): # api_key is the host here
+            raise ValueError("Could not connect to Ollama host")
+        return OllamaProvider(host=api_key) # pass it as host
     else:
         raise ValueError(f"Unsupported LLM provider: {provider_name}")
 
@@ -225,6 +231,23 @@ def chat():
         screenshot_base64 = data.get('screenshot')
         # panel_data = data.get('panelData') # Keep if needed, maybe append to last message?
         options = data.get('options', {}) # Includes model for Glama
+        ollama_args_str = data.get('ollamaArgs')
+
+        if provider_name == "Ollama" and ollama_args_str:
+            try:
+                # Parse comma-separated string into a dictionary
+                ollama_args = dict(arg.split(':', 1) for arg in ollama_args_str.split(','))
+                # Convert numeric strings to numbers
+                for key, value in ollama_args.items():
+                    try:
+                        ollama_args[key] = float(value)
+                    except (ValueError, TypeError):
+                        # Keep as string if conversion fails
+                        pass
+                # Merge with existing options, giving priority to ollama_args
+                options.update(ollama_args)
+            except Exception as e:
+                return jsonify({"error": f"Invalid format for Ollama Parameters: {e}"}), 400
 
         if not provider_name or not messages_input:
             return jsonify({"error": "Missing required parameters (llmProvider, messages)"}), 400
@@ -271,8 +294,8 @@ def chat():
                 # Subsequent system messages might need careful handling depending on context.
                 # Let's map system -> user for simplicity here.
                  target_role = 'user' if role in ['user', 'system'] else 'model'
-            elif provider_name == "Glama" or provider_name == "OpenAI":
-                 # OpenAI/Glama typically use 'user', 'assistant', 'system'
+            elif provider_name == "Glama" or provider_name == "OpenAI" or provider_name == "Ollama":
+                 # OpenAI/Glama/Ollama typically use 'user', 'assistant', 'system'
                  # Keep roles as they are, assuming frontend sends compatible roles
                  target_role = role
             else:
