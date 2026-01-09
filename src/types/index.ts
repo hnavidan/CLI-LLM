@@ -14,6 +14,7 @@ export interface ChatMessage {
   content: string;
   timestamp: number;
   screenshot?: string;
+  thought?: string;
 }
 
 export interface CustomDateTimePickerProps {

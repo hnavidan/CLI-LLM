@@ -122,6 +122,7 @@ export const LLMPanel: React.FC<Props> = ({ options, data, width, height, timeRa
         role: 'assistant',
         content: responseData.response,
         timestamp: Date.now(),
+        thought: responseData.thought, // Include thought if present
       };
       setChatHistory((prevHistory) => [...prevHistory, newAssistantMessage]);
 
@@ -184,13 +185,15 @@ export const LLMPanel: React.FC<Props> = ({ options, data, width, height, timeRa
             role: 'assistant',
             content: responseData.response,
             timestamp: Date.now(),
+            thought: responseData.thought, // Include thought if present
           };
 
           setChatHistory(prev => [...prev, userMarkerMessage, assistantMessage]);
 
+          // Only forward actual response to control endpoint, NOT the thought process
           if (isAutoForwardingEnabled && options.controlEndpointUrl) {
             await forwardResponseToEndpoint(
-              responseData.response,
+              responseData.response, // Only the actual response, not thought
               options.controlEndpointUrl,
               options.controlEndpointMethod || 'POST',
               options.controlEndpointHeaders || ''
@@ -222,7 +225,9 @@ export const LLMPanel: React.FC<Props> = ({ options, data, width, height, timeRa
     isAutoForwardingEnabled, 
     options.controlEndpointUrl, 
     options.controlEndpointMethod, 
-    options.controlEndpointHeaders
+    options.controlEndpointHeaders,
+    setChatHistory,
+    setLastSentTimestamp
   ]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {

@@ -71,6 +71,36 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 `}
               >
                 <strong>{message.role === 'user' ? 'You: ' : 'AI: '}</strong>
+                {message.thought && (
+                  <details
+                    className={css`
+                      margin-top: 8px;
+                      margin-bottom: 8px;
+                      padding: 8px;
+                      background-color: ${theme.isLight ? '#e3f2fd' : '#0a1929'};
+                      border-left: 3px solid ${theme.isLight ? '#2196f3' : '#42a5f5'};
+                      border-radius: 4px;
+                      font-style: italic;
+                      color: ${theme.isLight ? '#1565c0' : '#90caf9'};
+                    `}
+                  >
+                    <summary
+                      className={css`
+                        cursor: pointer;
+                        font-weight: 600;
+                        user-select: none;
+                        &:hover {
+                          opacity: 0.8;
+                        }
+                      `}
+                    >
+                      Reasoning
+                    </summary>
+                    <div className={css`margin-top: 8px; padding-left: 8px;`}>
+                      <ReactMarkdown>{message.thought}</ReactMarkdown>
+                    </div>
+                  </details>
+                )}
                 <ReactMarkdown>{message.content}</ReactMarkdown>
                 {message.screenshot && (
                   <div className={css`margin-top: 8px; position: relative; z-index: 10;`}>

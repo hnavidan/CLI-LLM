@@ -107,7 +107,23 @@ class VLLMProvider(BaseLLMProvider):
             response = self.client.chat.completions.create(**completion_kwargs)
             
             if response.choices and len(response.choices) > 0:
-                return response.choices[0].message.content.strip()
+                full_response = response.choices[0].message.content.strip()
+                
+                # Check if response contains thought process ending with </think>
+                if '</think>' in full_response:
+                    # Split by </think> tag
+                    parts = full_response.split('</think>', 1)
+                    thought_content = parts[0].strip()
+                    actual_response = parts[1].strip() if len(parts) > 1 else ''
+                    
+                    # Return as dictionary with both thought and response
+                    return {
+                        'thought': thought_content,
+                        'response': actual_response
+                    }
+                else:
+                    # No thought tag, return just the response as before
+                    return full_response
             else:
                 raise ValueError("vLLM API returned an empty response.")
         except Exception as e:

@@ -362,7 +362,15 @@ def chat():
         # The `generate_response` method now expects the prepared_messages list
         response_text = llm_provider.generate_response(prepared_messages, options)
 
-        return jsonify({"response": response_text})
+        # Handle response that may contain thought (from vLLM)
+        if isinstance(response_text, dict) and 'thought' in response_text:
+            print(f"Thought: {response_text.get('thought', '')}")
+            return jsonify({
+                "response": response_text.get('response', ''),
+                "thought": response_text.get('thought', '')
+            })
+        else:
+            return jsonify({"response": response_text})
 
     except ValueError as e:
         # Catch specific errors like invalid keys, missing options, API errors raised as ValueError
