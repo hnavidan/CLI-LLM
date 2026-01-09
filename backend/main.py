@@ -9,6 +9,7 @@ from llm_providers.xai_provider import XAIProvider  # Updated import
 from llm_providers.anthropic_provider import AnthropicProvider
 from llm_providers.glama_provider import GlamaProvider
 from llm_providers.ollama_provider import OllamaProvider
+from llm_providers.vllm_provider import VLLMProvider
 from typing import Dict, Any, List # Import List
 from flask_cors import CORS
 import base64
@@ -26,6 +27,7 @@ PROVIDER_ENV_VAR_MAP = {
     "xAI": "XAI_API_KEY",
     "Glama": "GLAMA_API_KEY",
     "Ollama": "OLLAMA_HOST",
+    "vLLM": "VLLM_BASE_URL",
 }
 
 PROVIDER_API_CONFIG = {
@@ -218,6 +220,10 @@ def create_llm_provider(provider_name: str, api_key: str):
         if not OllamaProvider.validate_connection(api_key): # api_key is the host here
             raise ValueError("Could not connect to Ollama host")
         return OllamaProvider(host=api_key) # pass it as host
+    elif provider_name == "vLLM":
+        if not VLLMProvider.validate_connection(api_key): # api_key is the base_url here
+            raise ValueError("Could not connect to vLLM server")
+        return VLLMProvider(base_url=api_key) # pass it as base_url
     else:
         raise ValueError(f"Unsupported LLM provider: {provider_name}")
 

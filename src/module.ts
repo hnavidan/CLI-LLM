@@ -71,7 +71,7 @@ const fetchModelsFromBackend = async (
 };
 
 export const plugin = new PanelPlugin<SimpleOptions>(LLMPanel).setPanelOptions((builder, context) => {
-  const providersWithModels = ['Glama', 'Google', 'OpenAI', 'xAI', 'Anthropic', 'Ollama'];
+  const providersWithModels = ['Glama', 'Google', 'OpenAI', 'xAI', 'Anthropic', 'Ollama', 'vLLM'];
 
   return builder
     .addTextInput({
@@ -92,6 +92,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(LLMPanel).setPanelOptions((
           { label: 'Google', value: 'Google' },
           { label: 'Anthropic', value: 'Anthropic' },
           { label: 'Ollama', value: 'Ollama' },
+          { label: 'vLLM', value: 'vLLM' },
         ],
       },
       defaultValue: 'Google',
@@ -99,7 +100,7 @@ export const plugin = new PanelPlugin<SimpleOptions>(LLMPanel).setPanelOptions((
     .addTextInput({
       path: 'apiKey',
       name: 'API Key or Host',
-      description: 'For Ollama, provide the host address (e.g., http://localhost:11434). For others, leave blank to use backend environment variables (Recommended).',
+      description: 'For Ollama/vLLM, provide the host address (e.g., http://localhost:11434 or http://localhost:8000/v1). For others, leave blank to use backend environment variables (Recommended).',
       defaultValue: '',
       settings: {
         secure: true,
