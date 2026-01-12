@@ -172,8 +172,9 @@ export class DataProcessor {
       const now = dateTime();
       const num = parseInt(relativeTime.slice(0, -1), 10);
       const unitLetter = relativeTime.slice(-1);
-      let unit: 'minutes' | 'hours' | 'days';
-      if (unitLetter === 'm') { unit = 'minutes'; }
+      let unit: 'seconds' | 'minutes' | 'hours' | 'days';
+      if (unitLetter === 's') { unit = 'seconds'; }
+      else if (unitLetter === 'm') { unit = 'minutes'; }
       else if (unitLetter === 'h') { unit = 'hours'; }
       else { unit = 'days'; }
       const from = dateTime().subtract(num, unit);

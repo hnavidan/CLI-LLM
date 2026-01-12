@@ -15,6 +15,7 @@ interface ChatInterfaceProps {
   handleResetChat: () => void;
   enlargedImage: string | null;
   setEnlargedImage: (image: string | null) => void;
+  isAutoUpdateEnabled: boolean;
 }
 
 export const ChatInterface: React.FC<ChatInterfaceProps> = ({
@@ -28,6 +29,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   handleResetChat,
   enlargedImage,
   setEnlargedImage,
+  isAutoUpdateEnabled,
 }) => {
   const theme = useTheme2();
 
@@ -142,11 +144,11 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
           />
           <Button
             onClick={handleSubmit}
-            disabled={loading}
+            disabled={!isAutoUpdateEnabled && loading}
             variant="primary"
             className={css`position: absolute; right: 8px; bottom: 8px; min-width: 0; padding: 4px 12px;`}
           >
-            {loading ? 'Sending...' : 'Send'}
+            {isAutoUpdateEnabled ? 'Queue' : (loading ? 'Sending...' : 'Send')}
           </Button>
         </div>
       </div>

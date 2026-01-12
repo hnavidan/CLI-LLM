@@ -30,6 +30,7 @@ export const LLMPanel: React.FC<Props> = ({ options, data, width, height, timeRa
   });
   const [isAutoUpdateEnabled, setIsAutoUpdateEnabled] = useState(false);
   const [isAutoForwardingEnabled, setIsAutoForwardingEnabled] = useState(false);
+  const [pendingAutoPrompt, setPendingAutoPrompt] = useState('');
 
   // Refs for managing state
   const lastSentTimestampRef = useRef<number | null>(null);
@@ -46,6 +47,13 @@ export const LLMPanel: React.FC<Props> = ({ options, data, width, height, timeRa
 
   // Handle manual form submission
   const handleSubmit = async () => {
+    // If auto-send is enabled, just store the prompt for the next auto-update
+    if (isAutoUpdateEnabled) {
+      setPendingAutoPrompt(prompt);
+      setPrompt('');
+      return;
+    }
+    
     setError(null);
     setLoading(true);
 
@@ -158,7 +166,9 @@ export const LLMPanel: React.FC<Props> = ({ options, data, width, height, timeRa
         
         try {
           const hiddenContent = `Incremental Data Update (JSON):\n${JSON.stringify(panelData, null, 2)}`;
-          const apiPromptContent = hiddenContent + '\n\n';
+          const apiPromptContent = pendingAutoPrompt 
+            ? hiddenContent + '\n\nUser Prompt: ' + pendingAutoPrompt
+            : hiddenContent + '\n\n';
           const userMessage: ChatMessage = { role: 'user', content: apiPromptContent, timestamp: Date.now() };
           const apiMessages = [...chatHistory, userMessage];
           
@@ -177,7 +187,7 @@ export const LLMPanel: React.FC<Props> = ({ options, data, width, height, timeRa
 
           const userMarkerMessage: ChatMessage = {
             role: 'user',
-            content: `(Data automatically updated to ${new Date(newLatestTimestamp).toLocaleTimeString()})`,
+            content: `(Data automatically updated to ${new Date(newLatestTimestamp).toLocaleTimeString()})${pendingAutoPrompt ? ' - ' + pendingAutoPrompt : ''}`,
             timestamp: Date.now(),
           };
           
@@ -189,6 +199,11 @@ export const LLMPanel: React.FC<Props> = ({ options, data, width, height, timeRa
           };
 
           setChatHistory(prev => [...prev, userMarkerMessage, assistantMessage]);
+          
+          // Clear pending prompt after it's been sent
+          if (pendingAutoPrompt) {
+            setPendingAutoPrompt('');
+          }
 
           // Only forward actual response to control endpoint, NOT the thought process
           if (isAutoForwardingEnabled && options.controlEndpointUrl) {
@@ -227,7 +242,9 @@ export const LLMPanel: React.FC<Props> = ({ options, data, width, height, timeRa
     options.controlEndpointMethod, 
     options.controlEndpointHeaders,
     setChatHistory,
-    setLastSentTimestamp
+    setLastSentTimestamp,
+    pendingAutoPrompt,
+    setPendingAutoPrompt
   ]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -272,6 +289,7 @@ export const LLMPanel: React.FC<Props> = ({ options, data, width, height, timeRa
         handleResetChat={() => handleResetChat(options.context)}
         enlargedImage={enlargedImage}
         setEnlargedImage={setEnlargedImage}
+        isAutoUpdateEnabled={isAutoUpdateEnabled}
       />
       
       <ControlPanel
