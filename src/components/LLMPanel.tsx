@@ -13,7 +13,7 @@ import { logger } from '../utils/logger';
 
 interface Props extends PanelProps<SimpleOptions> {}
 
-export const LLMPanel: React.FC<Props> = ({ options, data, width, height, timeRange }) => {
+export const LLMPanel: React.FC<Props> = ({ options, data, width, height, timeRange, id }) => {
   // State management
   const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState(false);
@@ -36,8 +36,8 @@ export const LLMPanel: React.FC<Props> = ({ options, data, width, height, timeRa
   const lastSentTimestampRef = useRef<number | null>(null);
   const isProcessingDataUpdate = useRef(false);
 
-  // Custom hooks
-  const { chatHistory, setChatHistory, handleResetChat } = useChatHistory(options.context);
+  // Custom hooks - use panel id for isolated chat history
+  const { chatHistory, setChatHistory, handleResetChat } = useChatHistory(options.context, id);
   const { availableFields, fieldOptions } = useAvailableFields(data);
 
   // Setter for last sent timestamp
