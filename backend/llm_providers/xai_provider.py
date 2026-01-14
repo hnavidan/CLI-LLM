@@ -59,7 +59,24 @@ class XAIProvider(BaseLLMProvider):
         try:
             response = client.chat.completions.create(**completion_kwargs)
             if response.choices:
-                return response.choices[0].message.content.strip()
+                message = response.choices[0].message
+                content = message.content.strip() if message.content else ''
+                
+                # Check for reasoning in JSON response
+                reasoning = None
+                if hasattr(message, 'reasoning') and message.reasoning:
+                    reasoning = message.reasoning
+                elif hasattr(message, 'reasoning_content') and message.reasoning_content:
+                    reasoning = message.reasoning_content
+                
+                # Return dict with thought if reasoning exists, otherwise just string
+                if reasoning:
+                    return {
+                        'thought': reasoning,
+                        'response': content
+                    }
+                else:
+                    return content
             else:
                 raise ValueError("xAI API returned an empty response.")
         except AuthenticationError:

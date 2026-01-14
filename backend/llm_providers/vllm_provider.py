@@ -107,12 +107,27 @@ class VLLMProvider(BaseLLMProvider):
             response = self.client.chat.completions.create(**completion_kwargs)
             
             if response.choices and len(response.choices) > 0:
-                full_response = response.choices[0].message.content.strip()
+                message = response.choices[0].message
+                content = message.content.strip() if message.content else ''
                 
-                # Check if response contains thought process ending with </think>
-                if '</think>' in full_response:
+                # First, check for reasoning in JSON response fields (e.g., gpt-o1 style)
+                reasoning = None
+                if hasattr(message, 'reasoning') and message.reasoning:
+                    reasoning = message.reasoning
+                elif hasattr(message, 'reasoning_content') and message.reasoning_content:
+                    reasoning = message.reasoning_content
+                
+                # If JSON reasoning found, return it
+                if reasoning:
+                    return {
+                        'thought': reasoning,
+                        'response': content
+                    }
+                
+                # Otherwise, check if response contains thought process ending with </think>
+                if '</think>' in content:
                     # Split by </think> tag
-                    parts = full_response.split('</think>', 1)
+                    parts = content.split('</think>', 1)
                     thought_content = parts[0].strip()
                     actual_response = parts[1].strip() if len(parts) > 1 else ''
                     
@@ -122,8 +137,8 @@ class VLLMProvider(BaseLLMProvider):
                         'response': actual_response
                     }
                 else:
-                    # No thought tag, return just the response as before
-                    return full_response
+                    # No thought/reasoning found, return just the response
+                    return content
             else:
                 raise ValueError("vLLM API returned an empty response.")
         except Exception as e:
