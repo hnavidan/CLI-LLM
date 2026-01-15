@@ -14,6 +14,16 @@ import { logger } from '../utils/logger';
 interface Props extends PanelProps<SimpleOptions> {}
 
 export const LLMPanel: React.FC<Props> = ({ options, data, width, height, timeRange, id }) => {
+  // Extract dashboard UID from URL to properly isolate chat history per dashboard
+  const getDashboardUid = useCallback(() => {
+    const pathname = window.location.pathname;
+    // Match patterns like /d/dashboard-uid/ or /d-solo/dashboard-uid/
+    const match = pathname.match(/\/d(?:-solo)?\/([^/]+)/);
+    return match ? match[1] : 'default';
+  }, []);
+
+  const [dashboardUid] = useState(() => getDashboardUid());
+
   // State management
   const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState(false);
@@ -36,8 +46,8 @@ export const LLMPanel: React.FC<Props> = ({ options, data, width, height, timeRa
   const lastSentTimestampRef = useRef<number | null>(null);
   const isProcessingDataUpdate = useRef(false);
 
-  // Custom hooks - use panel id for isolated chat history
-  const { chatHistory, setChatHistory, handleResetChat } = useChatHistory(options.context, id);
+  // Custom hooks - use dashboard UID for isolated chat history per dashboard
+  const { chatHistory, setChatHistory, handleResetChat } = useChatHistory(options.context, dashboardUid);
   const { availableFields, fieldOptions } = useAvailableFields(data);
 
   // Setter for last sent timestamp
