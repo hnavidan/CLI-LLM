@@ -2,6 +2,9 @@
 
 CLI-LLM is an open-source project that brings Large Language Model (LLM) capabilities directly into Grafana dashboards. It consists of a Grafana panel plugin and a backend service, enabling interactive AI-powered analytics, chat, and closed-loop decision making with support for multiple LLM providers.
 
+Demo paper:
+
+H. Navidan, M. Seif, H. V. Poor, I. Moerman and A. Shahid, "Closed-loop Intelligence Using Large Language Models in Wireless Networks," 2025 16th IFIP Wireless and Mobile Networking Conference (WMNC), Leuven, Belgium, 2025, pp. 184-185, doi: [10.23919/WMNC67099.2025.11299274](https://ieeexplore.ieee.org/document/11299274).
 
 ## Overview
 
@@ -41,6 +44,11 @@ This repository contains:
       allow_loading_unsigned_plugins = navidan-llm-panel
    ```
 
+## Citation
+
+- H. Navidan, M. Seif, H. V. Poor, I. Moerman and A. Shahid, "Closed-loop Intelligence Using Large Language Models in Wireless Networks," 2025 16th IFIP Wireless and Mobile Networking Conference (WMNC), Leuven, Belgium, 2025, pp. 184-185,
+ [https://doi.org/10.1109/ACCESS.2019.2949460](https://doi.org/10.23919/WMNC67099.2025.11299274).
+  
 ## TODO
 
 - [x] Fetch models from the API provider for other providers
