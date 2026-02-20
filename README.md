@@ -4,7 +4,7 @@ CLI-LLM is an open-source project that brings Large Language Model (LLM) capabil
 
 Demo paper:
 
-H. Navidan, M. Seif, H. V. Poor, I. Moerman and A. Shahid, "Closed-loop Intelligence Using Large Language Models in Wireless Networks," 2025 16th IFIP Wireless and Mobile Networking Conference (WMNC), Leuven, Belgium, 2025, pp. 184-185, doi: [10.23919/WMNC67099.2025.11299274](https://ieeexplore.ieee.org/document/11299274).
+H. Navidan, M. Seif, H. V. Poor, I. Moerman and A. Shahid, "Closed-loop Intelligence Using Large Language Models in Wireless Networks," 2025 16th IFIP Wireless and Mobile Networking Conference (WMNC), Leuven, Belgium, 2025, pp. 184-185, doi: [10.23919/WMNC67099.2025.11299274](https://ieeexplore.ieee.org/document/11299274). [PDF](https://opendl.ifip-tc6.org/db/conf/wmnc/wmnc2025/1571213659.pdf)
 
 ## Overview
 
